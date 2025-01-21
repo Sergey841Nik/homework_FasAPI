@@ -6,22 +6,22 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.get("/")
-def home_page():
+def home_page() -> str:
     return "Главная страница"
 
 @app.get("/user/admin")
-def admin_page():
+def admin_page()-> str:
     return "Вы вошли как админ"
 
 @app.get("/user/{user_id}")
-def user_page(user_id: int):
+def user_page(user_id: int)-> str:
     return f"Вы вошли как пользователь № {user_id}"
 
 @app.get("/user")
 def user_info(
     username: str,
     age: int,
-):
+)-> str:
     return f"Информация о пользователе. Имя: {username}, Возраст: {age}"
 
 
