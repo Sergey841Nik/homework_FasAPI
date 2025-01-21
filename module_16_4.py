@@ -38,30 +38,30 @@ def add_user(user: UserAdd) -> User:
     return nuw_user
 
 
-def valid_user_id(user_id: int):
+def valid_user_id(user_id: int) -> User:
     for user in users:
         if user.id == user_id:
             return user
     raise HTTPException(status_code=404, detail="User not found")
 
 
-@app.put("/user/{user_id}/")
+@app.put("/user/{user_id}/", response_model=User)
 def update_user(
     user: Annotated[User, Depends(valid_user_id)],  # Выполняем проверку до запуска основной функции
     user_update: UserAdd,
-):
+) -> User:
     user.username = user_update.username
     user.age = user_update.age
     return user
 
 
 @app.delete("/user/{user_id}")
-def delete_user(user_del: Annotated[User, Depends(valid_user_id)]):
+def delete_user(user_del: Annotated[User, Depends(valid_user_id)]) -> User:
     for i, user in enumerate(users):
         if user.id == user_del.id:
             del users[i]
             break
-    return f"User: {user_del} is deleted"
+    return user_del
 
 
 if __name__ == "__main__":
