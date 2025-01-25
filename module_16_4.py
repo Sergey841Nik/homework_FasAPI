@@ -2,7 +2,7 @@ from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 app = FastAPI()
@@ -11,11 +11,6 @@ class User(BaseModel):
     id: int
     username: str
     age: int
-
-class UserAdd(BaseModel):
-    username: str = Field(min_length=3, max_length=20, description="Имя пользователя")
-    age: int = Field(ge=18, description="Возраст пользователя")
-    
 
 users: list[User] = []
 
@@ -30,10 +25,10 @@ def get_user() -> list:
     return users
 
 
-@app.post("/user/", response_model=User)
-def add_user(user: UserAdd) -> User:
+@app.post("/user/{username}/{age}/", response_model=User)
+def add_user(username: str, age: int) -> User:
     new_user_id = max((u.id for u in users), default=0) + 1
-    nuw_user = User(id=new_user_id, username=user.username, age=user.age)
+    nuw_user = User(id=new_user_id, username=username, age=age)
     users.append(nuw_user)
     return nuw_user
 
@@ -45,17 +40,18 @@ def valid_user_id(user_id: int) -> User:
     raise HTTPException(status_code=404, detail="User not found")
 
 
-@app.put("/user/{user_id}/", response_model=User)
+@app.put("/user/{user_id}/{username}/{age}/", response_model=User)
 def update_user(
     user: Annotated[User, Depends(valid_user_id)],  # Выполняем проверку до запуска основной функции
-    user_update: UserAdd,
+    username: str,
+    age: int,
 ) -> User:
-    user.username = user_update.username
-    user.age = user_update.age
+    user.username = username
+    user.age = age
     return user
 
 
-@app.delete("/user/{user_id}")
+@app.delete("/user/{user_id}/")
 def delete_user(user_del: Annotated[User, Depends(valid_user_id)]) -> User:
     for i, user in enumerate(users):
         if user.id == user_del.id:
