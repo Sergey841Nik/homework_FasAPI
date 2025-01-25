@@ -3,7 +3,7 @@ from typing import Annotated
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 app = FastAPI()
